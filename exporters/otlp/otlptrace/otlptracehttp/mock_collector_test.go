@@ -48,7 +48,7 @@ func (c *mockCollector) Stop() error {
 }
 
 func (c *mockCollector) MustStop(t *testing.T) {
-	assert.NoError(t, c.server.Shutdown(context.Background()))
+	assert.NoError(t, c.server.Shutdown(t.Context()))
 }
 
 func (c *mockCollector) GetSpans() []*tracepb.Span {
@@ -145,15 +145,16 @@ func (c *mockCollector) getInjectHTTPStatus() int {
 	return status
 }
 
-func (c *mockCollector) getInjectResponseHeader() (h map[string]string) {
+func (c *mockCollector) getInjectResponseHeader() map[string]string {
+	var h map[string]string
 	if len(c.injectResponseHeader) == 0 {
-		return
+		return h
 	}
 	h, c.injectResponseHeader = c.injectResponseHeader[0], c.injectResponseHeader[1:]
 	if len(c.injectResponseHeader) == 0 {
 		c.injectResponseHeader = nil
 	}
-	return
+	return h
 }
 
 func readRequest(r *http.Request) ([]byte, error) {
